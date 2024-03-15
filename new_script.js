@@ -162,6 +162,7 @@ function gatherFormData() {
         var bodyVariableInput = document.getElementById('templateBodyvariable' + i + 'Input');
         if (bodyVariableInput && !bodyVariableInput.hidden) {
             formData.templateBodyVariables.push(bodyVariableInput.value);
+            console.log(bodyVariableInput.value);
         }
     }
 
@@ -171,6 +172,82 @@ function gatherFormData() {
 function getValueOrNull(elementId) {
     var element = document.getElementById(elementId);
     return element ? (element.value !== null ? element.value : null) : null;
+}
+
+// function populateTemplate(formData) {
+//     var formContainer = document.getElementById('formContainer');
+//     formContainer.innerHTML = '';
+
+//     function addParagraph(text) {
+//         var element = document.createElement('p');
+//         element.textContent = text;
+//         formContainer.appendChild(element);
+//     }
+
+//     for (var key in formData) {
+//         if (formData.hasOwnProperty(key)) {
+//             var value = formData[key];
+//             if (value !== null && value !== "" && key !== 'templateBody' && key !== 'templateBodyVariables') {
+//                 addParagraph(key + ": " + value);
+//             }
+//         }
+//     }
+
+//     var templateBody = formData.templateBody;
+//     var templateBodyVariables = formData.templateBodyVariables;
+//     if (templateBody && templateBodyVariables) {
+//         var replacedBody = replaceVariables(templateBody, templateBodyVariables);
+//         addParagraph("Template Body: " + replacedBody);
+//     }
+
+//     for (var i = 1; i <= 6; i++) {
+//         var customButton = formData['templateCustomButton' + i + 'Input'];
+//         if (customButton && customButton.trim() !== "") {
+//             addParagraph("Custom Button " + i + ": " + customButton);
+//         }
+//     }
+
+//     if (formData.templateFooterTextVariable1 !== undefined || formData.templateFooterTextVariable1 !== null) {
+//         addParagraph("Message Footer: " + formData.templateFooterTextVariable1);
+//         console.log(formData.templateFooterTextVariable1);
+//     } else if (formData.templateFooterTextVariable2 !== undefined || formData.templateFooterTextVariable2 !== null) {
+//         addParagraph("Message Footer: " + formData.templateFooterTextVariable2);
+//         console.log(formData.templateFooterTextVariable2);
+//     } else if (formData.templateFooterTextVariable3 !== undefined || formData.templateFooterTextVariable3 !== null) {
+//         addParagraph("Message Footer: " + formData.templateFooterTextVariable3);
+//         console.log(formData.templateFooterTextVariable3);
+//     }
+//     addParagraph("Call Button: " + formData.templateButtonCTACallPhoneInput);
+//     addParagraph("WhatsApp Button: " + formData.templateButtonCTACallWAInput);
+//     addParagraph("Website Link 1: " + formData.templateButtonCTAWebsite1TextInput + " - " + formData.templateButtonCTAWebsite1URLInput);
+//     addParagraph("Website Link 2: " + formData.templateButtonCTAWebsite2TextInput + " - " + formData.templateButtonCTAWebsite2URLInput);
+//     addParagraph("Offer Code: " + formData.templateButtonCTAOfferCodeInput);
+//     addParagraph("Marketing Opt-Out: " + formData.templateButtonCTAFormInput);
+// }
+
+
+function replaceVariables(templateBody, templateBodyVariables) {
+    for (var i = 1; i <= 10; i++) {
+        var variable = '{{' + i + '}}';
+        var value = templateBodyVariables[i - 1] || '';
+        templateBody = templateBody.replace(new RegExp(variable, 'g'), value);
+    }
+    return templateBody;
+}
+
+
+function replaceVariables(templateBody, templateBodyVariables) {
+    var words = templateBody.split(' ');
+
+    for (var i = 0; i < words.length; i++) {
+        if (words[i].includes('{{')) {
+            var index = parseInt(words[i].match(/\d+/)[0]) - 1;
+            if (templateBodyVariables[index]) {
+                words[i] = templateBodyVariables[index];
+            }
+        }
+    }
+    return words.join(' ');
 }
 
 function populateTemplate(formData) {
@@ -200,45 +277,32 @@ function populateTemplate(formData) {
     }
 
     for (var i = 1; i <= 6; i++) {
-        var customButton = formData['templateCustomButton' + i + 'Input'];
+        var customButton = formData['templateCustomButton' + i];
         if (customButton && customButton.trim() !== "") {
             addParagraph("Custom Button " + i + ": " + customButton);
         }
     }
 
-    addParagraph("Message Footer: " + formData.templateFooterTextInput);
-    addParagraph("Call Button: " + formData.templateButtonCTACallPhoneInput);
-    addParagraph("WhatsApp Button: " + formData.templateButtonCTACallWAInput);
-    addParagraph("Website Link 1: " + formData.templateButtonCTAWebsite1TextInput + " - " + formData.templateButtonCTAWebsite1URLInput);
-    addParagraph("Website Link 2: " + formData.templateButtonCTAWebsite2TextInput + " - " + formData.templateButtonCTAWebsite2URLInput);
-    addParagraph("Offer Code: " + formData.templateButtonCTAOfferCodeInput);
-    addParagraph("Marketing Opt-Out: " + formData.templateButtonCTAFormInput);
-}
-
-
-function replaceVariables(templateBody, templateBodyVariables) {
-    for (var i = 1; i <= 10; i++) {
-        var variable = '{{' + i + '}}';
-        var value = templateBodyVariables[i - 1] || '';
-        templateBody = templateBody.replace(new RegExp(variable, 'g'), value);
-    }
-    return templateBody;
-}
-
-
-function replaceVariables(templateBody, templateBodyVariables) {
-    var words = templateBody.split(' ');
-
-    for (var i = 0; i < words.length; i++) {
-        if (words[i].includes('{{')) {
-            var index = parseInt(words[i].match(/\d+/)[0]) - 1;
-            if (templateBodyVariables[index]) {
-                words[i] = templateBodyVariables[index];
-            }
+    var footerText = getValueOrNull('templateFooterTextInput');
+    if (footerText) {
+        addParagraph("Message Footer: " + footerText);
+    } else {
+        var footerTextVariable1 = getValueOrNull('templateFooterTextVariable1Input');
+        var footerTextVariable2 = getValueOrNull('templateFooterTextVariable2Input');
+        var footerTextVariable3 = getValueOrNull('templateFooterTextVariable3Input');
+        if (footerTextVariable1 || footerTextVariable2 || footerTextVariable3) {
+            addParagraph("Message Footer: " + [footerTextVariable1, footerTextVariable2, footerTextVariable3].filter(Boolean).join(", "));
         }
     }
-    return words.join(' ');
+
+    addParagraph("Call Button: " + getValueOrNull('templateButtonCTACallPhoneInput'));
+    addParagraph("WhatsApp Button: " + getValueOrNull('templateButtonCTACallWAInput'));
+    addParagraph("Website Link 1: " + getValueOrNull('templateButtonCTAWebsite1TextInput') + " - " + getValueOrNull('templateButtonCTAWebsite1URLInput'));
+    addParagraph("Website Link 2: " + getValueOrNull('templateButtonCTAWebsite2TextInput') + " - " + getValueOrNull('templateButtonCTAWebsite2URLInput'));
+    addParagraph("Offer Code: " + getValueOrNull('templateButtonCTAOfferCodeInput'));
+    addParagraph("Marketing Opt-Out: " + getValueOrNull('templateButtonCTAFormInput'));
 }
+
 
 function sendForm() {
     var formData = gatherFormData();
