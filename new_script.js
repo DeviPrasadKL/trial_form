@@ -177,13 +177,17 @@ function populateTemplate(formData) {
     var formContainer = document.getElementById('formContainer');
     formContainer.innerHTML = '';
 
+    function addParagraph(text) {
+        var element = document.createElement('p');
+        element.textContent = text;
+        formContainer.appendChild(element);
+    }
+
     for (var key in formData) {
         if (formData.hasOwnProperty(key)) {
             var value = formData[key];
             if (value !== null && value !== "" && key !== 'templateBody' && key !== 'templateBodyVariables') {
-                var element = document.createElement('p');
-                element.textContent = key + ": " + value;
-                formContainer.appendChild(element);
+                addParagraph(key + ": " + value);
             }
         }
     }
@@ -192,11 +196,25 @@ function populateTemplate(formData) {
     var templateBodyVariables = formData.templateBodyVariables;
     if (templateBody && templateBodyVariables) {
         var replacedBody = replaceVariables(templateBody, templateBodyVariables);
-        var templateBodyElement = document.createElement('p');
-        templateBodyElement.textContent = "Template Body: " + replacedBody;
-        formContainer.appendChild(templateBodyElement);
+        addParagraph("Template Body: " + replacedBody);
     }
+
+    for (var i = 1; i <= 6; i++) {
+        var customButton = formData['templateCustomButton' + i + 'Input'];
+        if (customButton && customButton.trim() !== "") {
+            addParagraph("Custom Button " + i + ": " + customButton);
+        }
+    }
+
+    addParagraph("Message Footer: " + formData.templateFooterTextInput);
+    addParagraph("Call Button: " + formData.templateButtonCTACallPhoneInput);
+    addParagraph("WhatsApp Button: " + formData.templateButtonCTACallWAInput);
+    addParagraph("Website Link 1: " + formData.templateButtonCTAWebsite1TextInput + " - " + formData.templateButtonCTAWebsite1URLInput);
+    addParagraph("Website Link 2: " + formData.templateButtonCTAWebsite2TextInput + " - " + formData.templateButtonCTAWebsite2URLInput);
+    addParagraph("Offer Code: " + formData.templateButtonCTAOfferCodeInput);
+    addParagraph("Marketing Opt-Out: " + formData.templateButtonCTAFormInput);
 }
+
 
 function replaceVariables(templateBody, templateBodyVariables) {
     for (var i = 1; i <= 10; i++) {
